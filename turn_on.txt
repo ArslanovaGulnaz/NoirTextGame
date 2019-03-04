@@ -1,0 +1,51 @@
+import vk_api
+import vk_api.longpoll as lp
+import random
+
+vk_session = vk_api.VkApi(token='939c512e95afe62173c19e92d97f3e45bc2ea2bb075a5268be974a909fd77d3d0f4fd4cf31f53dc7d2509')
+vk_session._auth_token()
+
+def hello():
+    resp = random.choice(
+        ['Привет!', 'Добрый день!', 'Дароу']) + ' Хочешь сыграть в мою интерактивную игру? "Да" - да, "Нет" - нет.'
+    vk.messages.send(user_id=event.user_id, random_id=random.randint(1, 255), message=resp)
+
+def start_dial1():
+    vk.messages.send(user_id=event.user_id, random_id=random.randint(1, 255), message='Сыграем.\n'
+        'Вы идете по темному переулку. Вдруг вы видите в свете фонаря силуэт непонятной формы.\n'
+        'Ваши действия?\n'
+        '1. Убегу\n'
+        '2. Пойду вперед, не обращая внимания\n'
+        '3. Подойду к силуэту')
+
+def start_dial2():
+    vk.messages.send(user_id=event.user_id, random_id=random.randint(1, 255), message='Приходи позже')
+
+def act1_dial1():
+    mes = 'Вы в спешке убегаете, но спотыкаетесь. Над собой Вы слышите тяжелое дыхание. ' \
+    '"Не стоило убегать, друг", - говорит голос. Через минуту он уходит, ' \
+    'а к Вашему бездыханному телу уже спешит скорая помощь'
+    vk.messages.send(user_id=event.user_id, random_id=random.randint(1, 255), message=mes)
+
+def act2_dial2():
+    mes = 'Вы нервно вздыхаете, принимая сложное решение идти вперед. Пытаясь смотреть только вниз,' \
+    ' вы медленно проходите мимо силуэта, чувствуя на себе пристальный взгляд. Но фигура не двигается.' \
+    ' Вы успешно проходите мимо опасного участка, так ничего и не узнав.'
+    vk.messages.send(user_id=event.user_id, random_id=random.randint(1, 255), message=mes)
+
+longpoll = lp.VkLongPoll(vk_session)
+vk = vk_session.get_api()
+for event in longpoll.listen():
+    if event.type == lp.VkEventType.MESSAGE_NEW and event.text:
+        if event.text == 'Привет':
+            hello()
+        if event.text == 'Да' or event.text == 'да':
+            start_dial1()
+        if event.text == 'Нет' or event.text == 'нет':
+            start_dial2()
+        if event.text == 'Убегу':
+            act1_dial1()
+            hello()
+        if event.text == 'Пойду вперед, не обращая внимания':
+            act2_dial2()
+            hello()
